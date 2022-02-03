@@ -1,2 +1,2 @@
 
-![screenshot](C:\test-task\Screenshot_648.jpg)
+![screenshot](/test-task/Screenshot_648.jpg)
