@@ -1,0 +1,30 @@
+# Spring Boot configuration
+spring:
+  # Database
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:~/Sector
+    username: sa
+    password:
+  # JPA properties
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database: H2
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+  # H2 properties
+  h2:
+    console:
+      enabled: true
+      path: /h2
+# Logger configuration
+logging:
+  level:
+    org.springframework: info
+    org.hibernate: debug
+# Server configuration
+server:
+  port: 8081
+

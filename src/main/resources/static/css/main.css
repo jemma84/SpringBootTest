@@ -1,0 +1,7 @@
+.dropdown-item.parent {
+    padding-left: 50px;
+}
+
+.dropdown-item.subParent {
+    padding-left: 75px;
+}
