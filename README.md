@@ -1,2 +1,2 @@
 
-![screenshot](/test-task/Screenshot_648.jpg)
+!![ScreenShot](/test-task/Screenshot_648.jpg)
