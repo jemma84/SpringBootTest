@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,6 +36,7 @@ public class SectorService implements ISectorDAO {
 
 
         public List<Sector> populateResultList(List<Sector> list, List<Sector> result, Sector sector) {
+                int indexOpt = 0;
                 List<Sector> subList = list.stream()
                     .filter(item -> item.getParentId() != null && item.getParentId().equals(sector.getSectorId())).collect(
                     Collectors.toList());
@@ -43,9 +45,13 @@ public class SectorService implements ISectorDAO {
                                 sector.setParentGroup(true);
                         }
                    subList.sort(Comparator.comparing(Sector::getName));
-                        int indexOpt = IntStream.range(0, result.size())
+                   OptionalInt optionalInt = IntStream.range(0, result.size())
                             .filter(i -> sector.getSectorId().equals(result.get(i).getSectorId()))
-                            .findFirst().getAsInt();
+                            .findFirst();
+                   if (optionalInt.isPresent()) {
+                           indexOpt = optionalInt.getAsInt();
+                   }
+
                    result.addAll(indexOpt + 1, subList);
                 }
 
