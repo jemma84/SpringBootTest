@@ -1,9 +1,47 @@
-insert into person (login, password)
-values ('bender', '$2a$04$RC1YL4cHzsnk2wYoZkiHEOVUY/5qpZwoi1P0Uc1QS45GzIF9m1znO'); //1qaz
-insert into person (login, password)
-values ('lila', '$2a$04$l2HTu7lhhq9iTLFz9mf8T.xqUqVLLRfQN8iqpua.KiIt9pDzYt1LK'); //2wsx
-insert into person (login, password)
-values ('fry', '$2a$04$tvMkJdnWDpRn.uJioCYENueZmF7PdrrC8Aw10uAbG6POjL6WQZr4y'); //3edc
+set -e
+
+export PGPASSWORD="$POSTGRES_PASSWORD"
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+  CREATE USER $TEST_USER WITH PASSWORD '$TEST_PASSWORD';
+  CREATE DATABASE $TEST_DB;
+  GRANT ALL PRIVILEGES ON DATABASE $TEST_DB TO $TEST_USER;
+EOSQL
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d "$TEST_DB" <<-EOSQL
+   GRANT ALL ON SCHEMA public TO $TEST_USER;
+EOSQL
+psql -v ON_ERROR_STOP=1 --username "$TEST_USER" -d "$TEST_DB" <<-EOSQL
+create table person (
+     person_id	serial primary key,
+     login	varchar(50)	not null,
+     email varchar(50) not null unique,
+     password	varchar(100) not null
+);
+
+create table sector
+(
+    sector_id int,
+    name varchar(100) not null,
+    parent_id int,
+    constraint pk_sector_id primary key (sector_id),
+    foreign key (parent_id) references sector (sector_id)
+);
+
+create table person_sector
+(
+    person_id  serial not null,
+    sector_id int not null,
+    foreign key (person_id) references person (person_id),
+    foreign key (sector_id) references sector (sector_id),
+    constraint pk_person_sector primary key (person_id, sector_id)
+);
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+insert into person (login, email, password)
+values ('bender', 'bender@gmail.com', crypt('1qaz', gen_salt('bf')));
+insert into person (login, email, password)
+values ('lila', 'lila@gmail.com', crypt('2wsx', gen_salt('bf')));
+insert into person (login, email, password)
+values ('fry', 'fry@gmail.com', crypt('3edc', gen_salt('bf')));
 
 insert into sector (sector_id, name, parent_id)
 values (1, 'Manufacturing', null);
@@ -163,3 +201,4 @@ insert into sector (sector_id, name, parent_id)
 values (112, 'Road', 21);
 insert into sector (sector_id, name, parent_id)
 values (113, 'Water', 21);
+EOSQL

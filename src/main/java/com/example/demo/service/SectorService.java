@@ -1,8 +1,8 @@
 package com.example.demo.service;
-import com.example.demo.dao.ISectorDAO;
 import com.example.demo.model.Sector;
 import com.example.demo.repository.SectorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,29 +13,27 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-public class SectorService implements ISectorDAO {
-        @Autowired
-        private SectorRepository sectorRepository;
+@RequiredArgsConstructor
+@Slf4j
+public class SectorService {
 
-        @Override
+        private final SectorRepository sectorRepository;
+
         public List<Sector> getSectorList() {
             List<Sector> result = new ArrayList<>();
             List<Sector> list = sectorRepository.findAll();
             List<Sector> rootElements = list.stream().filter(item -> item.getParentId() == null)
-                .sorted(Comparator.comparing(Sector::getName)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(Sector::getName)).toList();
 
             result.addAll(rootElements);
 
-            list.stream().forEach(item -> {
-                    populateResultList(list, result, item);
-            });
-
+            list.forEach(item -> populateResultList(list, result, item));
 
             return result;
         }
 
 
-        public List<Sector> populateResultList(List<Sector> list, List<Sector> result, Sector sector) {
+        public void populateResultList(List<Sector> list, List<Sector> result, Sector sector) {
                 int indexOpt = 0;
                 List<Sector> subList = list.stream()
                     .filter(item -> item.getParentId() != null && item.getParentId().equals(sector.getSectorId())).collect(
@@ -55,6 +53,5 @@ public class SectorService implements ISectorDAO {
                    result.addAll(indexOpt + 1, subList);
                 }
 
-                return result;
         }
 }

@@ -1,49 +1,59 @@
 package com.example.demo.service;
 
 import com.example.demo.TestBase;
-import com.example.demo.model.Sector;
-import com.example.demo.repository.SectorRepository;
+import com.example.demo.dto.PersonDTO;
 
 import com.example.demo.model.Person;
 import com.example.demo.repository.PersonRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 public class PersonServiceTest extends TestBase {
-        @Autowired
-        PersonService personService;
-
-        @Autowired
-        SectorRepository sectorRepository;
-
-        @Autowired
-        private PersonRepository personRepository;
+        private final PersonRepository personRepository = Mockito.mock(PersonRepository.class);
+        private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+        PersonService personService = new PersonService(personRepository, passwordEncoder);
 
         @Test
-        void testFindpersonByNameAndSaveChoise() {
+        void testFindPersonByEmailSuccessful() {
+                Person person = new Person();
+                person.setId(1L).setEmail("bender@gmail.com").setLogin("bender");
+                Mockito.when(personRepository.findByEmail("bender@gmail.com"))
+                    .thenReturn(Optional.of(person));
+                Person result = personService.findPersonByEmail("bender@gmail.com");
+                Assertions.assertEquals(result.getLogin(), "bender");
+        }
 
-                Person returnPerson = personRepository.findPersonByLogin("bender");
+        @Test
+        void testFindPersonByEmailFailed() {
+                Person person = new Person();
+                person.setId(1L).setEmail("fake@gmail.com").setLogin("fake");
+                Mockito.when(personRepository.findByEmail("fake@gmail.com"))
+                    .thenReturn(Optional.empty());
 
-                Assertions.assertNotNull(returnPerson);
+                assertThrows(NoSuchElementException.class, () -> personService.findPersonByEmail("fake@gmail.com"));
+        }
 
+        @Test
+        void savePerson() {
+                PersonDTO person = new PersonDTO();
+                person.setId(1L).setEmail("bender@gmail.com").setLogin("bender").setPassword("123");
 
-                Optional<Sector> sector = sectorRepository.findById(42L);
-                Assertions.assertNotNull(sector);
+                ArgumentCaptor<Person> argumentCaptor = ArgumentCaptor.forClass(Person.class);
 
-                List<Sector> list = new ArrayList<>();
-                list.add(sector.get());
-                returnPerson.setSectors(list);
-                Person updatedPerson = personService.savePerson(returnPerson);
-                assertEquals(updatedPerson.getSectors().size(), 1);
+                personService.savePerson(person);
 
+                verify(personRepository).save(argumentCaptor.capture());
+
+                Assertions.assertEquals(argumentCaptor.getValue().getLogin(), "bender");
         }
 
 
