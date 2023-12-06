@@ -1,15 +1,23 @@
 1.download docker-image from dockerhub
-2.run next command: docker run -p 8084:8081 jemma84/springboot-sector-task
+2.run next command: docker run -p 8084:8082 jemma84/demo, login as 
 ## Running
 
-To run the sample, execute the following command in a repository's root directory:
+To run the sample locally, execute the following command in a repository's root directory:
 
 ```bash
 ./gradlew bootRun
 ```
-6.go to http://localhost:8082 and try to login as bender/1qaz
+6.go to http://localhost:8082 and try to login as bender/1qaz or create new user
 
-To run the PostgreSQL you need to execute the docker-compose.yml. Example in the terminal:
+To run the PostgreSQL locally you need to execute the postgres.yml. 
+To build the docker image run:
 
-```shell script
-docker-compose up -d
+```bash
+  ./gradlew bootBuildImage
+```
+To start the application with docker compose:
+
+```bash
+  docker compose up -d
+```
+

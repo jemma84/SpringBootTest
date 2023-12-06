@@ -4,6 +4,7 @@ import com.example.demo.dto.PersonDTO;
 import com.example.demo.model.Person;
 import com.example.demo.service.PersonService;
 import com.example.demo.service.SectorService;
+import com.example.demo.validation.ValidationGroup;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,12 +39,14 @@ public class MainController {
         }
 
         @PostMapping("/save")
+        @Validated(ValidationGroup.Update.class)
         public String savePersonData(@ModelAttribute("person") @Valid PersonDTO person) {
                 personService.updatePersonData(person);
                 return "redirect:/";
         }
 
         @PostMapping("/registerUser")
+        @Validated(ValidationGroup.Create.class)
         public String create(@ModelAttribute("person") @Valid PersonDTO person, HttpServletRequest request) {
                 personService.savePerson(person);
 

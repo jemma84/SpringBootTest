@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.TestBase;
 import com.example.demo.dto.PersonDTO;
 
+import com.example.demo.exception.PersonNotFoundException;
 import com.example.demo.model.Person;
 import com.example.demo.repository.PersonRepository;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +40,7 @@ public class PersonServiceTest extends TestBase {
                 Mockito.when(personRepository.findByEmail("fake@gmail.com"))
                     .thenReturn(Optional.empty());
 
-                assertThrows(NoSuchElementException.class, () -> personService.findPersonByEmail("fake@gmail.com"));
+                assertThrows(PersonNotFoundException.class, () -> personService.findPersonByEmail("fake@gmail.com"));
         }
 
         @Test

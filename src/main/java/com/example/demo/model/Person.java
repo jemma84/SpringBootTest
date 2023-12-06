@@ -42,8 +42,6 @@ public class Person {
         @Column(nullable=false)
         private String password;
 
-        //@NotEmpty(message = "At least one sector is required")
-        //@Size(min = 1, max = 5)
         @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         @JoinTable(name = "person_sector",
             joinColumns = @JoinColumn(name = "person_id"),

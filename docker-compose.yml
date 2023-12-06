@@ -1,11 +1,37 @@
 version: "3.1"
 
 services:
-  test-postgres:
+  db:
     env_file: docker/.env
     image: postgres:13.2
     ports:
-      - "127.0.0.1:5432:5432"
+      - 5432:5432
     volumes:
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+    healthcheck:
+      test: [ CMD-SHELL, 'pg_isready -U postgres' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webapp:
+    image: jemma84/demo:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 8084:8082
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xss512k -Xmx256M -XX:ReservedCodeCacheSize=64M
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT=5432
+    networks:
+      - backend
+
+networks:
+  backend:
 

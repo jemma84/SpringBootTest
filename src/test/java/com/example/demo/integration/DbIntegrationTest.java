@@ -1,7 +1,9 @@
 package com.example.demo.integration;
 
 import com.example.demo.dto.PersonDTO;
+import com.example.demo.exception.PersonNotFoundException;
 import com.example.demo.model.Person;
+import com.example.demo.repository.PersonRepository;
 import com.example.demo.repository.SectorRepository;
 import com.example.demo.service.PersonService;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +19,9 @@ import org.testcontainers.junit.jupiter.Container;
 public class DbIntegrationTest {
     @Autowired
     PersonService personService;
+
+    @Autowired
+    PersonRepository personRepository;
 
     @Autowired
     SectorRepository sectorRepository;
@@ -48,7 +53,7 @@ public class DbIntegrationTest {
         person.setEmail("emmy@gmail.com").setLogin("emmy").setPassword("777");
 
         personService.savePerson(person);
-        Person person1 = personService.findPersonByEmail("emmy@gmail.com");
+        Person person1 = personRepository.findByEmail("emmy@gmail.com").orElseThrow(PersonNotFoundException::new);
         Assertions.assertEquals(2L, person1.getId());
 
     }

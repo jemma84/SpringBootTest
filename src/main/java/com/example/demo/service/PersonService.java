@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.PersonDTO;
+import com.example.demo.exception.PersonNotFoundException;
 import com.example.demo.model.Person;
 import com.example.demo.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +16,25 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class PersonService implements IPersonService {
+public class PersonService {
         private final PersonRepository repository;
         private final PasswordEncoder passwordEncoder;
 
 
         public Person getCurrentPerson() {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                return repository.findByEmail(authentication.getName()).orElseThrow();
+                return repository.findByEmail(authentication.getName()).orElseThrow(PersonNotFoundException::new);
         }
 
-        public Person updatePersonData(PersonDTO person) {
+        public void updatePersonData(PersonDTO person) {
                 Person updatedPerson =  getCurrentPerson();
                 updatedPerson.setLogin(person.getLogin());
                 updatedPerson.setSectors(person.getSectors());
-                return repository.save(updatedPerson);
+                repository.save(updatedPerson);
         }
 
 
-        @Override public void savePerson(PersonDTO personDTO) {
+        public void savePerson(PersonDTO personDTO) {
                 String hashedPassword = passwordEncoder.encode(personDTO.getPassword());
                 repository.save(new Person()
                                     .setLogin(personDTO.getLogin())
@@ -41,8 +42,7 @@ public class PersonService implements IPersonService {
                                     .setPassword(hashedPassword));
         }
 
-        @Override
         public Person findPersonByEmail(String email) {
-                return repository.findByEmail(email).orElseThrow();
+                return repository.findByEmail(email).orElseThrow(PersonNotFoundException::new);
         }
 }

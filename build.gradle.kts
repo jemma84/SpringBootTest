@@ -1,10 +1,17 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     java
     id("io.spring.dependency-management") version "1.1.3"
-    id("org.springframework.boot") version "2.6.3"
+    id("org.springframework.boot") version "3.0.6"
 }
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+version = "0.1.1-SNAPSHOT"
+
 repositories {
     mavenCentral()
 }
@@ -32,4 +39,7 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+tasks.named<BootBuildImage>("bootBuildImage") {
+    imageName.set("${project.name}:${project.version}")
 }
